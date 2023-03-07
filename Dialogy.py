@@ -53,7 +53,6 @@ class Application(tk.Tk):
         axisx = []
         axisy = []
 
-        t = pl.linspace(0,0.1,100000)
 
         with open(self.filename,"r") as f:
             while True:
@@ -68,8 +67,8 @@ class Application(tk.Tk):
             print(axisx)
             print(axisy)
 
-            pl.plot(t,axisx,color ="#ff3311")
-            pl.plot(t,axisy)
+            pl.plot(axisx,axisy)
+            
 
             pl.grid(True)
             pl.show()

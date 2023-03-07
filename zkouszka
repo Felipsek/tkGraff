@@ -1,0 +1,29 @@
+        
+import pylab as pl
+
+
+
+soubor = "soubor.txt"
+axisx = []
+axisy = []
+
+t = pl.linspace(-100,1,100)
+
+with open(soubor,"r") as f:
+    while True:
+        line = f.readline()
+        if line == "":
+            break
+        linesplit = line.split()
+        if len(linesplit) == 2:
+            x, y = line.split()
+            axisx.append(float(x))
+            axisy.append(float(y))
+    print(axisx)
+    print(axisy)
+
+    
+    pl.plot(axisx,axisy)
+
+    pl.grid(True)
+    pl.show()
