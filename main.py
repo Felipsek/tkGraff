@@ -117,7 +117,7 @@ class Application(tk.Tk):
 
 
         print(x,y)
-        py.plot(x,y, linestyle = self.lineVar.get())
+        py.plot(x,y, linestyle = self.lineVar.get(), marker = self.markerVar.get())
         py.title(self.titleEntry.value)
         py.xlabel(self.xlabelEntry.value)
         py.ylabel(self.ylabelEntry.value)
