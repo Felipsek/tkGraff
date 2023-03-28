@@ -4,6 +4,7 @@ from os.path import basename, splitext
 import tkinter as tk
 from tkinter import filedialog
 import pylab as py
+from scipy.interpolate import CubicSpline, PchipInterpolator, Akima1DInterpolator, UnivariateSpline
 
 # from tkinter import ttk
 
@@ -31,6 +32,11 @@ class MyEntry(tk.Entry):
 class Application(tk.Tk):
     name = basename(splitext(basename(__file__.capitalize()))[0])
     name = "Grafiátor"
+    colors = ("black","red","magenta", "green","blue", "orange","yellow")
+    ifunction = {}
+    for f in CubicSpline, PchipInterpolator, Akima1DInterpolator, UnivariateSpline:
+        ifunction[f.__name__] = f
+
 
     def __init__(self):
         super().__init__(className=self.name)
@@ -61,23 +67,39 @@ class Application(tk.Tk):
 
         tk.Label(self.grafFrame, text="Titulek").grid(row=0,column=0)
         self.titleEntry = MyEntry(self.grafFrame)
-        self.titleEntry.grid(row=0,column=1)
+        self.titleEntry.grid(row=0,column=1,columnspan=2)
 
         tk.Label(self.grafFrame, text="OsaX").grid(row=1,column=0)
         self.xlabelEntry = MyEntry(self.grafFrame)
-        self.xlabelEntry.grid(row=1,column=1)
+        self.xlabelEntry.grid(row=1,column=1,columnspan=2)
 
         tk.Label(self.grafFrame, text="OsaY").grid(row=2,column=0)
         self.ylabelEntry = MyEntry(self.grafFrame)
-        self.ylabelEntry.grid(row=2,column=1)
+        self.ylabelEntry.grid(row=2,column=1,columnspan=2)
 
         tk.Label(self.grafFrame, text = "Čára").grid(row=3,column=0)
         self.lineVar = tk.StringVar(value= "-")
         tk.OptionMenu(self.grafFrame,self.lineVar,"none", ":","-.","--","-").grid(row=3,column=1, sticky="w")
+        self.colorVar = tk.StringVar(value= "black")
+        tk.OptionMenu(self.grafFrame,self.colorVar,*self.colors).grid(row=3,column=2, sticky="w")
 
         tk.Label(self.grafFrame, text = "Marker").grid(row=4,column=0)
         self.markerVar = tk.StringVar(value= "o")
         tk.OptionMenu(self.grafFrame,self.markerVar,"none", *tuple(".,o+PxX*1234<>v^")).grid(row=4,column=1, sticky="w")
+        self.mcolorVar = tk.StringVar(value= "black")
+        tk.OptionMenu(self.grafFrame,self.mcolorVar,*self.colors).grid(row=4,column=2, sticky="w")
+
+        tk.Label(self.grafFrame, text = "Interpolace").grid(row=6,column=0)
+        self.interpolationVar = tk.StringVar(value= "None")
+        tk.OptionMenu(self.grafFrame,self.interpolationVar,"None",*self.ifunction.keys()).grid(row=6,column=1, sticky="w")
+        self.icolorVar = tk.StringVar(value= "black")
+        tk.OptionMenu(self.grafFrame,self.icolorVar,*self.colors).grid(row=6,column=2, sticky="w")
+
+
+        self.gridVar = tk.BooleanVar(value=True)
+        tk.Label(self.grafFrame, text = "mřížka").grid(row=5,column=0)
+        tk.Checkbutton(self.grafFrame,variable= self.gridVar).grid(row=5,column=1,sticky="w")
+
 
         #tlačítka
         self.plotBtn = tk.Button(self, text="steč", command=self.plot)
@@ -117,16 +139,26 @@ class Application(tk.Tk):
 
 
         print(x,y)
-        py.plot(x,y, linestyle = self.lineVar.get(), marker = self.markerVar.get())
+        py.plot(x,y, linestyle = self.lineVar.get(), marker = self.markerVar.get(), color = self.colorVar.get(), markerfacecolor = self.mcolorVar.get(),markeredgecolor = self.mcolorVar.get() )
         py.title(self.titleEntry.value)
         py.xlabel(self.xlabelEntry.value)
         py.ylabel(self.ylabelEntry.value)
+        py.grid(self.gridVar.get())
+
+        if self.interpolationVar.get() in self.ifunction:
+            x_min = min(x)
+            x_max = max(x)
+            xx = py.linspace(x_min,x_max)
+            funkce = self.ifunction[self.interpolationVar.get()](x,y)
+            yy = funkce(xx)
+            py.plot(xx,yy, color = self.icolorVar.get())
         py.show()
 
     
     def chooseFile(self, event=None):
         path = filedialog.askopenfilename()
         self.fileEntry.value = path
+        self.fileEntry.xview_moveto(1)
 
 app = Application()
 app.mainloop()
