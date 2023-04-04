@@ -154,7 +154,7 @@ class Application(tk.Tk):
             py.plot(xx,yy, color = self.icolorVar.get())
         py.show()
 
-    
+
     def chooseFile(self, event=None):
         path = filedialog.askopenfilename()
         self.fileEntry.value = path
